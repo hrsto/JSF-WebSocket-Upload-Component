@@ -60,7 +60,7 @@ Attributes support EL.
 
 ## Localization
 
-It's done quite easily. Go to `src\main\resources\localization\com\webarity\wsUpload` and copy the root bundle. Rename it to something like `WSUploadUI_fr_FR.properties` and translate the text to French.
+It's done quite easily. Go to `src\main\resources\localization\com\webarity\wsUpload` and copy the root bundle. Rename it to something like `WSUploadUI_fr_FR.properties` and translate the text to French. Edit `src\main\resources\META-INF\faces-config.xml`: `<application>` -> `<locale-config>` -> add a `<supported-locale>` element for the new language.
 
 ---
 
