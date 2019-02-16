@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="2.3" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd">
+
+    <component>
+        <component-type>WSUpload</component-type>
+        <component-class>com.webarity.wsUpload.WSUploadUI</component-class>
+    </component>
+
+    <render-kit>
+        <renderer>
+            <component-family>WebarityCustomComponents</component-family>
+            <renderer-type>WSUploadUIRenderer</renderer-type>
+            <renderer-class>com.webarity.wsUpload.WSUploadUIRenderer</renderer-class>
+        </renderer>
+    </render-kit>
+
+    <application>
+        <locale-config>
+            <default-locale>en</default-locale>
+            <supported-locale>bg</supported-locale>
+        </locale-config> 
+        <system-event-listener>
+            <system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>
+            <system-event-listener-class>com.webarity.wsUpload.listeners.StartupWebSockeHook</system-event-listener-class>
+        </system-event-listener>
+    </application>
+</faces-config>
