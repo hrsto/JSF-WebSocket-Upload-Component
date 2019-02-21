@@ -30,7 +30,7 @@ public class WSUploadUI extends UIInput implements ClientBehaviorHolder {
     protected static final String DEFAULT_PATH = System.getenv("temp");
 
     private static enum Props {
-        label, styleClass, style, maxUploadSize, wsBufferSize, filePath, rendered, onProgress, onStart, onSuccess, onFail;
+        label, styleClass, style, maxUploadSize, wsBufferSize, filePath, rendered, onProgress, onStart, onSuccess, onFail, ctxRoot;
     }
 
     public String getLabel() {
@@ -39,6 +39,16 @@ public class WSUploadUI extends UIInput implements ClientBehaviorHolder {
 
     public void setLabel(String label) {
         getStateHelper().put(Props.label, label);
+    }
+
+    public String getCtxRoot() {return (String) getStateHelper().eval(Props.ctxRoot);}
+    public void setCtxRoot(String ctxRoot) {
+        String _c = ctxRoot;
+
+        if (_c != null && !_c.isEmpty()) {
+            _c = _c.startsWith("/") ? _c : "/".concat(_c);
+        }
+        getStateHelper().put(Props.ctxRoot, _c);
     }
 
     //user defined JavaScipt callbacks

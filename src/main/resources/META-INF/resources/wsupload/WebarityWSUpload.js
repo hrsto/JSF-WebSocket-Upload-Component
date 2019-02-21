@@ -77,7 +77,7 @@ var WebarityWSUploader = (function () {
 
     return {
 
-        init: (wsAddr, onProgress, onStart, onSuccess, onFail, txt, l, inpID, dzID) => {
+        init: (wsAddr, onProgress, onStart, onSuccess, onFail, txt, l, inpID, dzID, ctxRoot) => {
 
             text = txt;
 
@@ -96,7 +96,11 @@ var WebarityWSUploader = (function () {
             var host = location.host;
             var protocol = location.protocol.startsWith("http") ? (location.protocol.endsWith('s:') ? 'wss' : 'ws') : "";
             if (protocol == "") return;
-            address = protocol.concat('://').concat(host).concat(wsAddr).concat('?');
+            if (ctxRoot) {
+                address = protocol.concat('://').concat(host).concat(ctxRoot).concat(wsAddr).concat('?');
+            } else {
+                address = protocol.concat('://').concat(host).concat(wsAddr).concat('?');
+            }
 
             dropZoneID.ondragover = e => {
                 e.preventDefault();

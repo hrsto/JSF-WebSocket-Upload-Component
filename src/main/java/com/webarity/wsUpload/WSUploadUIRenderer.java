@@ -115,9 +115,9 @@ public class WSUploadUIRenderer extends Renderer {
 
         w.startElement("script", c);
 
-        w.writeText(String.format("WebarityWSUploader.init('%s', %s, %s, %s, %s, %s, '%s', '%s', '%s');",
+        w.writeText(String.format("WebarityWSUploader.init('%s', %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s');",
                 getEndpointAddress(), c.getOnProgress(), c.getOnStart(), c.getOnSuccess(), c.getOnFail(), renderLocalizedStrings(txt, ctx.getViewRoot().getLocale()), label,
-                fileInputElemID, dropZoneID), null);
+                fileInputElemID, dropZoneID, c.getCtxRoot()), null);
 
         w.endElement("script");
 

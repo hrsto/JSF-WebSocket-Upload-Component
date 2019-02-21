@@ -47,6 +47,9 @@ File upload is triggered immediately. If user clicks submit while file still upl
 
 ## Attributes:
 
+* `ctxRoot` - In cases where the app is running from a different context root than `/`, you will need to set  this. Example:
+    * for `http://192.168.0.1:8080/my-contact-page` : context root is `/`, thus no need to set this
+    * for `http://192.168.0.1:8080/mySite/my-contact-page` : context root is `mySite` and this attibute must be set to `/mySite`
 * `wsBufferSize` - in bytes, defaults to 500KB; memory buffer used to limit number of writes to disk. Set to higher if expecting large files
 * `label` - defaults to `Drop files here.`
 * `styleClass` - defaults to `ws_upld_style`; the html css class for this element
@@ -57,6 +60,15 @@ File upload is triggered immediately. If user clicks submit while file still upl
 * `onProgress`, `onStart`, `onSuccess`, `onFail` - user supplied JavaScript callbacks
 
 Attributes support EL.
+
+## Socket address:
+
+The system property `com.webarity.wsupload.endpointaddr` can be set to a custom websocket address. The WS address is constructed as follows:
+
+    ws://<some host>:<some port>/<System.getProperty("com.webarity.wsupload.endpointaddr")>
+
+It defaults to `com.webarity.upload`.
+
 
 ## Localization
 

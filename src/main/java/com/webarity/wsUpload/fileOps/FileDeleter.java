@@ -33,7 +33,7 @@ public class FileDeleter implements FileVisitor<Path> {
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
         l.log(Level.SEVERE, String.format("File visit failure for: %s", file.toAbsolutePath().toString()));
-                    return FileVisitResult.TERMINATE;
+        return FileVisitResult.TERMINATE;
     }
 
     @Override
