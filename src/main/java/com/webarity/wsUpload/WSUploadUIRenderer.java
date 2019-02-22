@@ -121,7 +121,7 @@ public class WSUploadUIRenderer extends Renderer {
 
         w.endElement("script");
 
-        w.close();
+        // w.close(); FIXME: some kind of a conflict with ajax - would show emptyResponse - An empty response was received from the server.  Check server error logs.
     }
 
     @SuppressWarnings({"unchecked"})
