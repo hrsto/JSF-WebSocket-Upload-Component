@@ -9,10 +9,10 @@ JSF component that enable mass file upload over a binary WebSocket connection.
     * max upload size (total) - per a single bulk upload
     * intermediary buffer size - in memory buffer to limit writes to disk
 * User supplied JavaScript callbacks for:
-    * `onProgress` - executed during the upload and percentage is passed as single argument
-    * `onStart` - before upload starts, this will be called and is going to be passed the upload ID string
-    * `onSuccess` - after successful upload, this is called and the number of uploaded files is passed as a single argument
-    * `onFail` - if upload fails, this is called and the fail message is passed as a single argument
+    * `onProgress` - executed during the upload with percentage and `thisInstanceId` passed as arguments
+    * `onStart` - before upload starts, this will be called and is going to be passed the upload ID string along with `thisInstanceId`
+    * `onSuccess` - after successful upload, this is called and the number of uploaded files and `thisInstanceId` passed as arguments
+    * `onFail` - if upload fails, this is called and the fail message and `thisInstanceId` passed as arguments
 * Backing bean receives a `List<Path>` on successful upload
 * Automatic clean up on failed or unclaimed uploads
 * Easily localizable
