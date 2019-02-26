@@ -1,7 +1,9 @@
-function WebarityWSUploader(wsAddr, onProgress, onStart, onSuccess, onFail, txt, l, inpID, dzID, ctxRoot) {
+function WebarityWSUploader(wsAddr, onProgress, onStart, onSuccess, onFail, txt, l, inpID, dzID, ctxRoot, instance) {
     this.dat;
     this.address;
     this.ws;
+
+    this.instance = instance; //If we want to keep files uniquely separated for each instance of this component, we use this identifier, which will translate to a specific child dir under the main dir.
 
     //client supplied callbacks
     this._onProgress = onProgress;
@@ -80,7 +82,7 @@ WebarityWSUploader.prototype = {
         this.dat = Array.from(files, f => f.slice());
         this.dat.unshift(header);
 
-        this.ws = new WebSocket(this.address.concat(`headerSize=${header.size}`));
+        this.ws = new WebSocket(this.address.concat(`headerSize=${header.size}&id=${this.instance}`));
         this.ws.binaryType = "blob";
 
         this.ws.onopen = (e) => {

@@ -11,7 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import javax.json.bind.Jsonb;
@@ -127,20 +129,33 @@ public class BinaryMessageHandler implements Partial<ByteBuffer> {
     Long totalFileSize = 0L;
 
     /**
+     * Key used to get the right socket instance parameters from the common http session. 
+     */
+    String instanceId;
+
+    /**
      * This represents the upload session, it contains the files and transfer ID. It will be immediatelly passed to client whether or not it's completed. It's up to the backing bean to figure that out. User will be able to click the submit button right away while this will download in the background.
      */
     CompletableFutureUpload upload;
 
     public BinaryMessageHandler(Session thisSession) throws IOException {
-        this.tempPath = (String)thisSession.getUserProperties().get(Config.WS_TEMP_FILE_PATH);;
+        this.instanceId = (String) thisSession.getRequestParameterMap().get("id").get(0);
+
+        @SuppressWarnings({"unchecked"})
+        ConcurrentHashMap<String, Map<String, Object>> chm = (ConcurrentHashMap<String, Map<String, Object>>) thisSession.getUserProperties().get(Config.INSTANCES_MAP);
+        Map<String, Object> optsMap = chm.get(instanceId);
+
+        
+        this.tempPath = Paths.get((String)optsMap.get(Config.WS_TEMP_FILE_PATH), instanceId).toString();
+        this.maxSize = (Long)optsMap.get(Config.MAX_SIZE_PARAM);
+        this.bufferSize = (Integer)optsMap.get(Config.WS_BUFFER_SIZE);
+
         this.sessionID = (String)thisSession.getUserProperties().get(Config.ID_KEY);;
         this.thisSession = thisSession;
 
         this.headerSize = Integer.parseInt(thisSession.getRequestParameterMap().get("headerSize").get(0));
         if (headerSize >= MAX_HEADER_SIZE) throw new IOException("Header abnormally big.");
 
-        this.maxSize = (Long)thisSession.getUserProperties().get(Config.MAX_SIZE_PARAM);
-        this.bufferSize = (Integer)thisSession.getUserProperties().get(Config.WS_BUFFER_SIZE);
         this.postback = thisSession.getBasicRemote();
         this.head = new byte[headerSize];
         this.bb = ByteBuffer.allocate(bufferSize);

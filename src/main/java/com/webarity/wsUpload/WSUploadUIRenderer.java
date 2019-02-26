@@ -5,11 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -54,10 +56,13 @@ public class WSUploadUIRenderer extends Renderer {
             ctx.addMessage(c.getClientId(), new FacesMessage(FacesMessage.SEVERITY_FATAL, txt.getString(Messages.ERROR_WebSocketNotOpen.getVal()), ""));
             return;
         }
-        
-        if (!Files.isWritable(Paths.get(c.getFilePath()))) {
+
+        Path rootPath = Paths.get(c.getFilePath());
+        if (!Files.isWritable(rootPath)) {
             ctx.addMessage(c.getClientId(), new FacesMessage(FacesMessage.SEVERITY_FATAL, txt.getString(Messages.ERROR_pathNotAccessible.getVal()), ""));
             return;
+        } else if (!Files.exists(rootPath.resolve(c.getThisInstanceId()))) {
+            Files.createDirectory(rootPath.resolve(c.getThisInstanceId()));
         }
 
         String label = Optional.ofNullable(c.getLabel()).orElse(txt.getString(Messages.COMMON_dropHere.getVal()));
@@ -99,9 +104,26 @@ public class WSUploadUIRenderer extends Renderer {
         HttpSession tempHttpSession = (HttpSession) ctx.getExternalContext().getSession(false);
         if (tempHttpSession != null) {
             SessionRegistry.whitelistSession(ctx.getExternalContext().getSessionId(false));
-            tempHttpSession.setAttribute(Config.MAX_SIZE_PARAM, c.getMaxUploadSize());
-            tempHttpSession.setAttribute(Config.WS_BUFFER_SIZE, c.getWsBufferSize());
-            tempHttpSession.setAttribute(Config.WS_TEMP_FILE_PATH, c.getFilePath());
+
+            @SuppressWarnings({"unchecked"})
+            ConcurrentHashMap<String, Map<String, Object>> instancesMap = (ConcurrentHashMap<String, Map<String, Object>>) tempHttpSession.getAttribute(Config.INSTANCES_MAP);
+            
+            if (instancesMap == null) {
+                instancesMap = new ConcurrentHashMap<>();
+                tempHttpSession.setAttribute(Config.INSTANCES_MAP, instancesMap);
+            }
+            
+            Map<String, Object> opts = instancesMap.get(c.getThisInstanceId());
+            
+            if (opts == null) {
+                opts = new HashMap<>();
+                instancesMap.put(c.getThisInstanceId(), opts);
+            }
+            
+            opts.put(Config.MAX_SIZE_PARAM, c.getMaxUploadSize());
+            opts.put(Config.WS_BUFFER_SIZE, c.getWsBufferSize());
+            opts.put(Config.WS_TEMP_FILE_PATH, c.getFilePath());
+
             tempHttpSession.setAttribute(Config.WS_RESOUCE_BUNDLE, txt);
         }
 
@@ -115,9 +137,9 @@ public class WSUploadUIRenderer extends Renderer {
 
         w.startElement("script", c);
 
-        w.writeText(String.format("new WebarityWSUploader('%s', %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s');",
+        w.writeText(String.format("new WebarityWSUploader('%s', %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', '%s');",
                 getEndpointAddress(), c.getOnProgress(), c.getOnStart(), c.getOnSuccess(), c.getOnFail(), renderLocalizedStrings(txt, ctx.getViewRoot().getLocale()), label,
-                fileInputElemID, dropZoneID, c.getCtxRoot()), null);
+                fileInputElemID, dropZoneID, c.getCtxRoot(), c.getThisInstanceId()), null);
 
         w.endElement("script");
 
