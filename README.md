@@ -58,6 +58,7 @@ File upload is triggered immediately. If user clicks submit while file still upl
 * `filePath` - defaults to `System.getenv("temp")`; where the files are stored. Each upload session will create a unique directory with the same name as the upload session ID string and place the files there
 * rendered - defaults to `true`; if set to false, component will not show up and no uploads will be allowed
 * `onProgress`, `onStart`, `onSuccess`, `onFail` - user supplied JavaScript callbacks
+* `thisInstanceId` - will appear as subdirectory of `filePath`. If using multiple instances of this element on the same page, this way you can differentiate between uploaded files from each instance by giving this a unique name. Or just use the same name and figure out which file to who belongs right after upload time...
 
 Attributes support EL.
 
