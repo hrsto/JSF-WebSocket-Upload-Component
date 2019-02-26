@@ -96,17 +96,17 @@ WebarityWSUploader.prototype = {
                     this.statusElement.textContent =  count > 1 ? this.text.HTML_filesUploaded.replace('{0}', count) : this.text.HTML_fileUploaded.replace('{0}', count);
                     this.timedMessage(this.label, '', 5);
     
-                    if (typeof _onSuccess === 'function') this._onSuccess(count);
+                    if (typeof _onSuccess === 'function') this._onSuccess(count, this.instance);
                 } else if (socketResponse.p) { //upload in progress
                     this.statusElement.textContent = this.text.HTML_percent.replace('{0}', socketResponse.p);
                     this.dropZoneID.style.background = `linear-gradient(90deg, rgb(46, 186, 253, 0.5) ${socketResponse.p}%, rgb(101, 152, 198, 0.5) ${socketResponse.p}%, rgba(0, 0, 0, 0) ${socketResponse.p + 0.5}%)`;
     
-                    if (typeof this._onProgress === 'function') this._onProgress(socketResponse.p);
+                    if (typeof this._onProgress === 'function') this._onProgress(socketResponse.p, this.instance);
                 } else if (!socketResponse.f && socketResponse.id) { //server has send an id string identifying this transfer session, upload has started
                     this.inputElement.value = socketResponse.id;
                     this.inputElement.dispatchEvent(this.syntheticChangeEvent);
     
-                    if (typeof this._onStart === 'function') this._onStart();
+                    if (typeof this._onStart === 'function') this._onStart(this.instance);
                 }
             });
         }
@@ -115,7 +115,7 @@ WebarityWSUploader.prototype = {
             this.timedMessage(msg, '', 1);
             this.timedMessage(this.label, '', 8);
             console.error(msg);
-            if (typeof this._onFail === 'function') _onFail(msg);
+            if (typeof this._onFail === 'function') _onFail(msg, this.instance);
         }
         this.ws.onclose = (e) => {
             if (e.wasClean) {
