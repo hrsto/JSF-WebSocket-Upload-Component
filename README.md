@@ -9,10 +9,15 @@ JSF component that enable mass file upload over a binary WebSocket connection.
     * max upload size (total) - per a single bulk upload
     * intermediary buffer size - in memory buffer to limit writes to disk
 * User supplied JavaScript callbacks for:
-    * `onProgress` - executed during the upload with percentage and `thisInstanceId` passed as arguments
-    * `onStart` - before upload starts, this will be called and is going to be passed the upload ID string along with `thisInstanceId`
-    * `onSuccess` - after successful upload, this is called and the number of uploaded files and `thisInstanceId` passed as arguments
-    * `onFail` - if upload fails, this is called and the fail message and `thisInstanceId` passed as arguments
+    * `onProgress` - executed during the upload with percentage, `instanceId`, and `transferId` passed as arguments
+    * `onStart` - before upload starts, this will be called and is going to be passed the upload ID string along with  `instanceId`, and `transferId` passed as arguments
+    * `onSuccess` - after successful upload, this is called and the number of uploaded files, `instanceId`, and `transferId` passed as arguments
+    * `onFail` - if upload fails, this is called and the fail message and `instanceId`, and `transferId` passed as arguments
+
+    `instanceId` means the current element. I.e. if there are multiple drap and drop uploaded elements on the same page, they will have unique `instanceId`. This paramter is used internally to supply different arguments (like path, max upload size, buffer size, etc...) to the different instance of the component within the same session.
+    
+    `transferId` - unique id for transfer. Internally a subdir to the main upload directory and there are the files ultimately put. This subdir is named after `transferId`.
+
 * Backing bean receives a `List<Path>` on successful upload
 * Automatic clean up on failed or unclaimed uploads
 * Easily localizable
@@ -58,7 +63,6 @@ File upload is triggered immediately. If user clicks submit while file still upl
 * `filePath` - defaults to `System.getenv("temp")`; where the files are stored. Each upload session will create a unique directory with the same name as the upload session ID string and place the files there
 * rendered - defaults to `true`; if set to false, component will not show up and no uploads will be allowed
 * `onProgress`, `onStart`, `onSuccess`, `onFail` - user supplied JavaScript callbacks
-* `thisInstanceId` - will appear as subdirectory of `filePath`. If using multiple instances of this element on the same page, this way you can differentiate between uploaded files from each instance by giving this a unique name. Or just use the same name and figure out which file to who belongs right after upload time...
 
 Attributes support EL.
 

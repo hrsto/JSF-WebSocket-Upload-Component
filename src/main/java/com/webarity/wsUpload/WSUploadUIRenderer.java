@@ -11,7 +11,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -61,8 +60,6 @@ public class WSUploadUIRenderer extends Renderer {
         if (!Files.isWritable(rootPath)) {
             ctx.addMessage(c.getClientId(), new FacesMessage(FacesMessage.SEVERITY_FATAL, txt.getString(Messages.ERROR_pathNotAccessible.getVal()), ""));
             return;
-        } else if (!Files.exists(rootPath.resolve(c.getThisInstanceId()))) {
-            Files.createDirectory(rootPath.resolve(c.getThisInstanceId()));
         }
 
         String label = Optional.ofNullable(c.getLabel()).orElse(txt.getString(Messages.COMMON_dropHere.getVal()));
@@ -102,30 +99,30 @@ public class WSUploadUIRenderer extends Renderer {
         w.endElement("div");
 
         HttpSession tempHttpSession = (HttpSession) ctx.getExternalContext().getSession(false);
-        if (tempHttpSession != null) {
-            SessionRegistry.whitelistSession(ctx.getExternalContext().getSessionId(false));
-
-            @SuppressWarnings({"unchecked"})
-            ConcurrentHashMap<String, Map<String, Object>> instancesMap = (ConcurrentHashMap<String, Map<String, Object>>) tempHttpSession.getAttribute(Config.INSTANCES_MAP);
-            
-            if (instancesMap == null) {
-                instancesMap = new ConcurrentHashMap<>();
-                tempHttpSession.setAttribute(Config.INSTANCES_MAP, instancesMap);
-            }
-            
-            Map<String, Object> opts = instancesMap.get(c.getThisInstanceId());
-            
-            if (opts == null) {
-                opts = new HashMap<>();
-                instancesMap.put(c.getThisInstanceId(), opts);
-            }
-            
-            opts.put(Config.MAX_SIZE_PARAM, c.getMaxUploadSize());
-            opts.put(Config.WS_BUFFER_SIZE, c.getWsBufferSize());
-            opts.put(Config.WS_TEMP_FILE_PATH, c.getFilePath());
-
-            tempHttpSession.setAttribute(Config.WS_RESOUCE_BUNDLE, txt);
+        if (tempHttpSession == null) {
+            ctx.addMessage(c.getClientId(), new FacesMessage(FacesMessage.SEVERITY_FATAL, txt.getString(Messages.ERROR_noSession.getVal()), ""));
+            return;
         }
+
+        @SuppressWarnings({"unchecked"})
+        Map<String, Map<String, Object>> compInstanceConfMap = (Map<String, Map<String, Object>>)tempHttpSession.getAttribute(Config.COMPONENT_INSTANCES);
+        if (compInstanceConfMap == null) {
+            compInstanceConfMap = new HashMap<>();
+            tempHttpSession.setAttribute(Config.COMPONENT_INSTANCES, compInstanceConfMap);
+        }
+        Map<String, Object> compInstance = compInstanceConfMap.get(c.getClientId());
+        if (compInstance == null) {
+            compInstance = new HashMap<>();
+            compInstanceConfMap.put(c.getClientId(), compInstance);
+        }
+        compInstance.put(Config.MAX_SIZE_PARAM, c.getMaxUploadSize());
+        compInstance.put(Config.WS_BUFFER_SIZE, c.getWsBufferSize());
+        compInstance.put(Config.WS_TEMP_FILE_PATH, c.getFilePath());
+
+        SessionRegistry.whitelistSession(ctx.getExternalContext().getSessionId(false));
+
+        tempHttpSession.setAttribute(Config.WS_RESOUCE_BUNDLE, txt);
+        
 
         w.startElement("input", c);
         w.writeAttribute("type", "text", "type");
@@ -139,7 +136,7 @@ public class WSUploadUIRenderer extends Renderer {
 
         w.writeText(String.format("new WebarityWSUploader('%s', %s, %s, %s, %s, %s, '%s', '%s', '%s', '%s', '%s');",
                 getEndpointAddress(), c.getOnProgress(), c.getOnStart(), c.getOnSuccess(), c.getOnFail(), renderLocalizedStrings(txt, ctx.getViewRoot().getLocale()), label,
-                fileInputElemID, dropZoneID, c.getCtxRoot(), c.getThisInstanceId()), null);
+                fileInputElemID, dropZoneID, c.getCtxRoot(), c.getClientId()), null);
 
         w.endElement("script");
 

@@ -11,9 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import javax.json.bind.Jsonb;
@@ -142,15 +142,14 @@ public class BinaryMessageHandler implements Partial<ByteBuffer> {
         this.instanceId = (String) thisSession.getRequestParameterMap().get("id").get(0);
 
         @SuppressWarnings({"unchecked"})
-        ConcurrentHashMap<String, Map<String, Object>> chm = (ConcurrentHashMap<String, Map<String, Object>>) thisSession.getUserProperties().get(Config.INSTANCES_MAP);
+        HashMap<String, Map<String, Object>> chm = (HashMap<String, Map<String, Object>>) thisSession.getUserProperties().get(Config.COMPONENT_INSTANCES);
         Map<String, Object> optsMap = chm.get(instanceId);
 
-        
-        this.tempPath = Paths.get((String)optsMap.get(Config.WS_TEMP_FILE_PATH), instanceId).toString();
+        this.tempPath = (String)optsMap.get(Config.WS_TEMP_FILE_PATH);
         this.maxSize = (Long)optsMap.get(Config.MAX_SIZE_PARAM);
         this.bufferSize = (Integer)optsMap.get(Config.WS_BUFFER_SIZE);
 
-        this.sessionID = (String)thisSession.getUserProperties().get(Config.ID_KEY);;
+        this.sessionID = (String)thisSession.getUserProperties().get(Config.ID_KEY);
         this.thisSession = thisSession;
 
         this.headerSize = Integer.parseInt(thisSession.getRequestParameterMap().get("headerSize").get(0));

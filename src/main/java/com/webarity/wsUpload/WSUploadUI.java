@@ -30,7 +30,7 @@ public class WSUploadUI extends UIInput implements ClientBehaviorHolder {
     protected static final String DEFAULT_PATH = System.getenv("temp");
 
     private static enum Props {
-        label, styleClass, style, maxUploadSize, wsBufferSize, filePath, rendered, onProgress, onStart, onSuccess, onFail, ctxRoot, thisInstanceId;
+        label, styleClass, style, maxUploadSize, wsBufferSize, filePath, rendered, onProgress, onStart, onSuccess, onFail, ctxRoot;
     }
 
     public String getLabel() {
@@ -39,14 +39,6 @@ public class WSUploadUI extends UIInput implements ClientBehaviorHolder {
 
     public void setLabel(String label) {
         getStateHelper().put(Props.label, label);
-    }
-
-    public String getThisInstanceId() {
-        return (String) getStateHelper().eval(Props.thisInstanceId);
-    }
-
-    public void setThisInstanceId(String thisInstanceId) {
-        getStateHelper().put(Props.thisInstanceId, thisInstanceId);
     }
 
     public String getCtxRoot() {return (String) getStateHelper().eval(Props.ctxRoot);}
