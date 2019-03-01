@@ -136,7 +136,8 @@ public class WSUploadUI extends UIInput implements ClientBehaviorHolder {
             cssOut.getAttributes().put("target", "head");
             ctx.getViewRoot().addComponentResource(ctx, cssOut);
         }
-        // super.processEvent(e);
+        
+        super.processEvent(e);
     }
 
     /**

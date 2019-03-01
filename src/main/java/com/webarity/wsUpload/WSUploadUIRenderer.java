@@ -83,18 +83,23 @@ public class WSUploadUIRenderer extends Renderer {
         w.writeText(label, null);
         w.endElement("span");
 
-        c.getClientBehaviors().entrySet().stream().filter(entry -> c.getEventNames().contains(entry.getKey()))
-                .forEach(entry -> {
-                    ClientBehaviorContext cbCtx = ClientBehaviorContext.createClientBehaviorContext(ctx, c,
-                            entry.getKey(), c.getClientId(), null);
-                    entry.getValue().stream().forEach(cb -> {
-                        try {
-                            w.writeAttribute(String.format("on%s", entry.getKey()), cb.getScript(cbCtx), null);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-                });
+        
+        c.getClientBehaviors()
+        .entrySet()
+        .stream()
+        .filter(entry -> c.getEventNames().contains(entry.getKey()))
+        .forEach(entry -> {
+            ClientBehaviorContext cbCtx = ClientBehaviorContext.createClientBehaviorContext(ctx, c,
+                    entry.getKey(), c.getClientId(), null);
+            entry.getValue().stream().forEach(cb -> {
+                try {
+                    w.writeAttribute(String.format("on%s", entry.getKey()), cb.getScript(cbCtx), null);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+        });
+        
 
         w.endElement("div");
 
@@ -167,6 +172,7 @@ public class WSUploadUIRenderer extends Renderer {
         if (idx != -1) {
             try {
                 c.setSubmittedValue(transfers.get(idx).get());
+                c.getClientBehaviors().forEach((event, behavior) -> behavior.forEach(b -> b.decode(ctx, c)));
                 transfers.remove(idx);
             } catch (InterruptedException | ExecutionException ex) {
                 ex.printStackTrace();
