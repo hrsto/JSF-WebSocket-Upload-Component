@@ -16,6 +16,9 @@
   display: inline-block;
   animation-iteration-count: infinite;
 }
+.ws_upld_style span {
+  pointer-events: none;
+}
 @keyframes pulse {
   0% {
     transform:scale(1);
